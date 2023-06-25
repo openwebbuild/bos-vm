@@ -584,9 +584,11 @@ class VmStack {
     if (basicElement === "img") {
       attributes.alt = attributes.alt ?? "not defined";
     } else if (basicElement === "a") {
-      if ("href" in attributes) {
-        attributes.href = sanitizeUrl(attributes.href);
-      }
+      Object.entries(attributes).forEach(([name, value]) => {
+        if (name.toLowerCase() === "href") {
+          attributes[name] = sanitizeUrl(value);
+        }
+      });
     } else if (element === "Widget") {
       attributes.depth = this.vm.depth + 1;
       attributes.config = [attributes.config, ...this.vm.widgetConfigs].filter(
@@ -1727,7 +1729,8 @@ export default class VM {
     }
 
     if (!this.code) {
-      throw new Error("Not a program");
+      this.alive = false;
+      return;
     }
 
     this.setReactState = setReactState
@@ -1961,6 +1964,10 @@ export default class VM {
         </div>
       );
     }
+    if (!this.alive) {
+      return <div className="alert alert-danger">VM is dead</div>;
+    }
+
     const result = this.execCode(args);
 
     return isReactObject(result) ||
