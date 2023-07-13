@@ -6,15 +6,16 @@ import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import React from "react";
 import mentions from "./remark/mentions";
 import hashtags from "./remark/hashtags";
+import widgets from "./remark/widgets";
 
 export const Markdown = (props) => {
-  const { onLinkClick, text, onMention, onHashtag, syntaxHighlighterProps } =
+  const { onLinkClick, text, onMention, onHashtag, onWidget, syntaxHighlighterProps } =
     props;
   return (
     <ReactMarkdown
       plugins={[]}
       rehypePlugins={[]}
-      remarkPlugins={[gfm, gemoji, mentions, hashtags]}
+      remarkPlugins={[gfm, gemoji, mentions, hashtags, widgets]}
       children={text}
       components={{
         strong({ node, children, ...props }) {
@@ -22,6 +23,8 @@ export const Markdown = (props) => {
             return onMention(node.properties?.accountId);
           } else if (onHashtag && node.properties?.hashtag) {
             return onHashtag(node.properties?.hashtag);
+          } else if (onWidget && node.properties?.path) {
+            return onWidget(node.properties);
           }
           return <strong {...props}>{children}</strong>;
         },
