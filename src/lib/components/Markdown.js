@@ -1,3 +1,4 @@
+import gemoji from 'remark-gemoji';
 import gfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -13,7 +14,7 @@ export const Markdown = (props) => {
     <ReactMarkdown
       plugins={[]}
       rehypePlugins={[]}
-      remarkPlugins={[gfm, mentions, hashtags]}
+      remarkPlugins={[gfm, gemoji, mentions, hashtags]}
       children={text}
       components={{
         strong({ node, children, ...props }) {
