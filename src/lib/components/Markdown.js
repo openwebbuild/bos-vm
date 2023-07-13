@@ -23,7 +23,7 @@ export const Markdown = (props) => {
             return onMention(node.properties?.accountId);
           } else if (onHashtag && node.properties?.hashtag) {
             return onHashtag(node.properties?.hashtag);
-          } else if (onWidget && node.properties?.path) {
+          } else if (onWidget && node.properties?.src) {
             return onWidget(node.properties);
           }
           return <strong {...props}>{children}</strong>;
