@@ -17,7 +17,7 @@ export default function widgets() {
       return false;
     }
 
-    // widget src, e.g. near/widget/ProfilePage.Sidebar
+    // widget src, e.g. mob.near/widget/Profile
     const src = captures[0];
     // widget props, e.g. { "accountId": "root.near" }
     let props = captures.length > 1 && captures[1].length > 1
