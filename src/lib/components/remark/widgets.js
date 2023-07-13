@@ -1,27 +1,28 @@
 import { findAndReplace } from "mdast-util-find-and-replace";
 
-const pathRegex = /{{([\w./?&=]+)}}/gi;
+// Matches URI that starts with bos:// scheme. Examples:
+// 1. bos://mob.near/widget/Profile
+// 2. bos://mob.near/widget/Profile?accountId=root.near
+// 3. bos://near.org/mob.near/widget/Profile?accountId=root.near
+// 4. bos://near.social/#/mob.near/widget/Profile?accountId=root.near
+const widgetUrlRegex = /^bos:\/\/(?:[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b)?(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*?)((?:(?:(?:[a-z\d]+[-_])*[a-z\d]+\.)*(?:[a-z\d]+[-_])*[a-z\d]+)\/widget\/(?:[-a-zA-Z0-9()@:%_\+.~#&\/=]+))(\?[-a-zA-Z0-9()@:%_\+.~#&\/=]*)*$/gi;
 
-export default function paths() {
-  function replace(value, path, match) {
+export default function widgets() {
+  function replace(value, captures, match) {
     if (
       /[\w`]/.test(match.input.charAt(match.index - 1)) ||
       /[/\w`]/.test(match.input.charAt(match.index + value.length)) ||
-      (path.match(/\//g) || []).length < 2
+      captures.length === 0
     ) {
       return false;
     }
 
-    const params = {};
-    const parts = path.split("?");
-    if (parts.length > 1) {
-      const queryParamString = parts[1];
-      const queryParams = queryParamString.split("&") || [];
-      for (const pair of queryParams) {
-        const [key, value] = pair.split("=");
-        params[key] = value;
-      }
-    }
+    // widget src, e.g. near/widget/ProfilePage.Sidebar
+    const src = captures[0];
+    // widget props, e.g. { "accountId": "root.near" }
+    let props = captures.length > 1 && captures[1].length > 1
+      ? Object.fromEntries(new URLSearchParams(captures[1]))
+      : {};
 
     let node = { type: "text", value };
 
@@ -30,8 +31,8 @@ export default function paths() {
       children: [node],
       data: {
         hProperties: {
-          src: parts[0],
-          props: params,
+          src,
+          props,
         },
       },
     };
@@ -40,7 +41,7 @@ export default function paths() {
   }
 
   function transform(markdownAST) {
-    findAndReplace(markdownAST, pathRegex, replace);
+    findAndReplace(markdownAST, widgetUrlRegex, replace);
     return markdownAST;
   }
 
