@@ -8,20 +8,14 @@ import { findAndReplace } from "mdast-util-find-and-replace";
 const widgetUrlRegex = /^bos:\/\/(?:[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b)?(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*?)((?:(?:(?:[a-z\d]+[-_])*[a-z\d]+\.)*(?:[a-z\d]+[-_])*[a-z\d]+)\/widget\/(?:[-a-zA-Z0-9()@:%_\+.~#&\/=]+))(\?[-a-zA-Z0-9()@:%_\+.~#&\/=]*)*$/gi;
 
 export default function widgets() {
-  function replace(value, captures, match) {
-    if (
-      /[\w`]/.test(match.input.charAt(match.index - 1)) ||
-      /[/\w`]/.test(match.input.charAt(match.index + value.length)) ||
-      captures.length === 0
-    ) {
+  function replace(value, src, params) {
+    // widget src, e.g. mob.near/widget/Profile
+    if (!src) {
       return false;
     }
-
-    // widget src, e.g. mob.near/widget/Profile
-    const src = captures[0];
     // widget props, e.g. { "accountId": "root.near" }
-    let props = captures.length > 1 && captures[1].length > 1
-      ? Object.fromEntries(new URLSearchParams(captures[1]))
+    let props = params && params.length > 1
+      ? Object.fromEntries(new URLSearchParams(params))
       : {};
 
     let node = { type: "text", value };
