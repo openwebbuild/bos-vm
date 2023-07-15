@@ -1,7 +1,7 @@
 import { findAndReplace } from "mdast-util-find-and-replace";
 
 // scheme://authority@path?query#fragment
-const urlRegex = /([a-z]+):\/\/(?:([^\/?#]*)@)?([^?]+)(?:\?([^#]*))?(?:#(.*))?/gi;
+const urlRegex = /(([a-z]+):\/\/(?:([^\/?#]*))?([^?]+)(?:\?([^#]*))?(?:#(.*))?)/gi;
 
 export default function widgets() {
   function replace(value, url, scheme, authority, path, query, fragment, match) {
