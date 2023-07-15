@@ -26,6 +26,7 @@ export default function widgets() {
           scheme,
           authority,
           path,
+          query,
           fragment
         },
       },
